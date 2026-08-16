@@ -99,7 +99,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             luoi.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             luoi.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             rangBuocChieuCaoLich,
-            tieuDeThongKe.topAnchor.constraint(equalTo: luoi.bottomAnchor, constant: 2),
+            tieuDeThongKe.topAnchor.constraint(greaterThanOrEqualTo: luoi.bottomAnchor,constant: 2),
             tieuDeThongKe.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             tieuDeThongKe.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
             chonTab.topAnchor.constraint(equalTo: tieuDeThongKe.bottomAnchor, constant: 2),
@@ -108,11 +108,13 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             noiDungTongHop.topAnchor.constraint(equalTo: chonTab.bottomAnchor, constant: 3),
             noiDungTongHop.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             noiDungTongHop.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            noiDungTongHop.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            noiDungTongHop.heightAnchor.constraint(equalToConstant: 130),
+            bangCongDoanDu.heightAnchor.constraint(equalToConstant: 130),
             bangCongDoanDu.topAnchor.constraint(equalTo: chonTab.bottomAnchor, constant: 3),
             bangCongDoanDu.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             bangCongDoanDu.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            bangCongDoanDu.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8)
+            noiDungTongHop.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -4),
+            bangCongDoanDu.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -4)
         ])
     }
 
