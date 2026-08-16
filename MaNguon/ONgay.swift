@@ -12,7 +12,7 @@ final class ONgay: UICollectionViewCell {
     func gan(ngay:Date, duLieu:DuLieuNgay){
         so.text = "\(TienIchNgay.lich.component(.day,from:ngay))"
         if duLieu.nghiLam { thongTin.text = "Nghỉ"; contentView.backgroundColor = .systemRed.withAlphaComponent(0.12); contentView.layer.borderColor = UIColor.systemRed.cgColor }
-        else if duLieu.daTinh { thongTin.text = String(format:"%.2f công\n%.2f%%",duLieu.soCong,duLieu.phanTram);contentView.backgroundColor = .systemPurple.withAlphaComponent(0.12);contentView.layer.borderColor = UIColor.systemPurple.cgColor }
-        else { thongTin.text = String(format:"%.2f công",duLieu.soCong); let du = duLieu.soCong>=1;contentView.backgroundColor = (du ? UIColor.systemGreen:UIColor.systemOrange).withAlphaComponent(0.12);contentView.layer.borderColor = (du ? UIColor.systemGreen:UIColor.systemOrange).cgColor }
+        else if duLieu.daTinh { thongTin.text = String(format:"%.2f%%",duLieu.phanTram);contentView.backgroundColor = .systemPurple.withAlphaComponent(0.12);contentView.layer.borderColor = UIColor.systemPurple.cgColor }
+        else { thongTin.text = ""; let du = duLieu.soCong>=1;contentView.backgroundColor = (du ? UIColor.systemGreen:UIColor.systemOrange).withAlphaComponent(0.12);contentView.layer.borderColor = (du ? UIColor.systemGreen:UIColor.systemOrange).cgColor }
     }
 }

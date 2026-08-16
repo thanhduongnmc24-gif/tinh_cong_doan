@@ -1,71 +1,28 @@
-name: Tao IPA va Release
-
+name: Tao IPA khong ky
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
-
 permissions:
   contents: write
-
 jobs:
-  tao-ipa-va-release:
+  tao-ipa:
     runs-on: macos-15
-
     steps:
-      - name: Tai ma nguon
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Cai XcodeGen
         run: brew install xcodegen
-
       - name: Tao Xcode project
         run: xcodegen generate
-
-      - name: Build ung dung
+      - name: Build app
         run: |
-          xcodebuild \
-            -project TinhCongSanLuong.xcodeproj \
-            -scheme TinhCongSanLuong \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath DerivedData \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
-
+          xcodebuild -project TinhCongSanLuong.xcodeproj -scheme TinhCongSanLuong -configuration Release -sdk iphoneos -derivedDataPath DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
       - name: Dong goi IPA
         run: |
-          rm -rf Payload
           mkdir -p Payload
-          cp -R \
-            DerivedData/Build/Products/Release-iphoneos/TinhCongSanLuong.app \
-            Payload/
-
+          cp -R DerivedData/Build/Products/Release-iphoneos/TinhCongSanLuong.app Payload/
           zip -r TinhCongSanLuong-unsigned.ipa Payload
-
-      - name: Tao ten phien ban
-        id: version
-        shell: bash
-        run: |
-          VERSION="v$(date +'%Y.%m.%d')-${GITHUB_RUN_NUMBER}"
-          echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "name=Tính Công Sản Lượng $VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Tao GitHub Release va tai IPA len
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            "TinhCongSanLuong-unsigned.ipa" \
-            --title "${{ steps.version.outputs.name }}" \
-            --notes "Bản IPA chưa ký dành cho iPhone. Tải IPA và ký bằng ESign." \
-            --target "${{ github.sha }}"
-
-      - name: Luu IPA vao Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: TinhCongSanLuong-unsigned
           path: TinhCongSanLuong-unsigned.ipa
-          retention-days: 30
