@@ -1,25 +1,285 @@
 import UIKit
-final class ManHinhNgay:UIViewController {
-    private var duLieu:DuLieuNgay;private let ngay:Date;private let khiDong:()->Void
-    private let batDau = UIDatePicker(),ketThuc = UIDatePicker(),nghi = UISwitch(),phutChuan = UITextField(),danhSach = UIStackView(),ketQua = UILabel()
-    init(ngay:Date,duLieu:DuLieuNgay,khiDong:@escaping()->Void){self.ngay = ngay;self.duLieu = duLieu;self.khiDong = khiDong;super.init(nibName:nil,bundle:nil)}
-    required init?(coder:NSCoder){fatalError()}
-    override func viewDidLoad(){super.viewDidLoad();view.backgroundColor = .systemGroupedBackground;let f = DateFormatter();f.locale = Locale(identifier:"vi_VN");f.dateStyle = .full;title = f.string(from:ngay).capitalized
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title:"Hủy",style:.plain,target:self,action:#selector(huy));navigationItem.rightBarButtonItem = UIBarButtonItem(title:"Đóng & lưu",style:.done,target:self,action:#selector(dongLuu))
-        batDau.datePickerMode = .time;ketThuc.datePickerMode = .time;batDau.preferredDatePickerStyle = .compact;ketThuc.preferredDatePickerStyle = .compact;batDau.date = duLieu.gioBatDau;ketThuc.date = duLieu.gioKetThuc;nghi.isOn = duLieu.nghiLam
-        phutChuan.keyboardType = .decimalPad;phutChuan.borderStyle = .roundedRect;phutChuan.text = String(format:"%.0f",duLieu.phutChuan)
-        danhSach.axis = .vertical;danhSach.spacing = 8;duLieu.congDoan.forEach{themDong($0)}
-        let them = UIButton(type:.system);them.setTitle("＋ Thêm công đoạn",for:.normal);them.addTarget(self,action:#selector(themMoi),for:.touchUpInside)
-        let nutTinh = UIButton(type: .system);var cfg = UIButton.Configuration.filled();cfg.title = "TÍNH SẢN LƯỢNG";cfg.cornerStyle = .large;nutTinh.configuration = cfg;nutTinh.addTarget(self, action: #selector(tinh), for: .touchUpInside)
-        ketQua.font = .monospacedDigitSystemFont(ofSize:28,weight:.bold);ketQua.textAlignment = .center;ketQua.text = String(format:"%.2f%%",duLieu.phanTram)
-        let noi = UIStackView(arrangedSubviews:[hang("Giờ vào",batDau),hang("Giờ về",ketThuc),hang("Nghỉ làm",nghi),hang("Phút chuẩn",phutChuan),danhSach,them,nutTinh,ketQua]);noi.axis = .vertical;noi.spacing = 14;noi.translatesAutoresizingMaskIntoConstraints = false
-        let cuon = UIScrollView();cuon.translatesAutoresizingMaskIntoConstraints = false;view.addSubview(cuon);cuon.addSubview(noi);NSLayoutConstraint.activate([cuon.topAnchor.constraint(equalTo:view.safeAreaLayoutGuide.topAnchor),cuon.bottomAnchor.constraint(equalTo:view.bottomAnchor),cuon.leadingAnchor.constraint(equalTo:view.leadingAnchor),cuon.trailingAnchor.constraint(equalTo:view.trailingAnchor),noi.topAnchor.constraint(equalTo:cuon.contentLayoutGuide.topAnchor,constant:18),noi.bottomAnchor.constraint(equalTo:cuon.contentLayoutGuide.bottomAnchor,constant:-30),noi.leadingAnchor.constraint(equalTo:cuon.frameLayoutGuide.leadingAnchor,constant:18),noi.trailingAnchor.constraint(equalTo:cuon.frameLayoutGuide.trailingAnchor,constant:-18)])
+
+final class ManHinhNgay: UIViewController, UITextFieldDelegate {
+    private var duLieu: DuLieuNgay
+    private let ngay: Date
+    private let khiDong: () -> Void
+
+    private let cuon = UIScrollView()
+    private let noiDung = UIStackView()
+    private let batDau = UIDatePicker()
+    private let ketThuc = UIDatePicker()
+    private let nghi = UISwitch()
+    private let phutChuan = UITextField()
+    private let danhSach = UIStackView()
+    private let ketQua = UILabel()
+    private weak var oDangNhap: UITextField?
+
+    init(ngay: Date, duLieu: DuLieuNgay, khiDong: @escaping () -> Void) {
+        self.ngay = ngay
+        self.duLieu = duLieu
+        self.khiDong = khiDong
+        super.init(nibName: nil, bundle: nil)
     }
-    private func hang(_ ten:String,_ v:UIView)->UIStackView{let l = UILabel();l.text = ten;l.font = .systemFont(ofSize:16,weight:.semibold);let h = UIStackView(arrangedSubviews:[l,v]);h.distribution = .equalSpacing;h.alignment = .center;return h}
-    private func themDong(_ c:CongDoan){let sl = UITextField(),hs = UITextField();[sl,hs].forEach{$0.borderStyle = .roundedRect;$0.keyboardType = .decimalPad};sl.placeholder = "Số lượng tờ";hs.placeholder = "Hệ số %";sl.text = c.soLuong==0 ? "":String(c.soLuong);hs.text = c.heSo==0 ? "":String(c.heSo);let xoa = UIButton(type:.system);xoa.setImage(UIImage(systemName:"minus.circle.fill"),for:.normal);xoa.tintColor = .systemRed;let h = UIStackView(arrangedSubviews:[sl,hs,xoa]);h.spacing = 8;sl.widthAnchor.constraint(equalTo: hs.widthAnchor).isActive = true;xoa.addAction(UIAction{[weak self,weak h] _ in if let h{self?.danhSach.removeArrangedSubview(h);h.removeFromSuperview()}},for:.touchUpInside);danhSach.addArrangedSubview(h)}
-    @objc private func themMoi(){themDong(CongDoan())}
-    private func docDong()->[CongDoan]{danhSach.arrangedSubviews.compactMap{guard let h = $0 as? UIStackView,h.arrangedSubviews.count>=2,let a = h.arrangedSubviews[0] as? UITextField,let b = h.arrangedSubviews[1] as? UITextField else{return nil};return CongDoan(soLuong:Double(a.text?.replacingOccurrences(of:",",with:".") ?? "") ?? 0,heSo:Double(b.text?.replacingOccurrences(of:",",with:".") ?? "") ?? 0)}}
-    @objc private func tinh(){view.endEditing(true);let p = Double(phutChuan.text?.replacingOccurrences(of:",",with:".") ?? "") ?? 0;guard p>0 else{return};duLieu.congDoan = docDong();duLieu.phutChuan = p;duLieu.phanTram = duLieu.congDoan.reduce(0){$0+$1.soLuong*$1.heSo}/p*100;duLieu.daTinh = true;ketQua.text = String(format:"%.2f%%",duLieu.phanTram)}
-    @objc private func huy(){dismiss(animated:true)}
-    @objc private func dongLuu(){duLieu.gioBatDau = batDau.date;duLieu.gioKetThuc = ketThuc.date;duLieu.nghiLam = nghi.isOn;duLieu.phutChuan = Double(phutChuan.text?.replacingOccurrences(of:",",with:".") ?? "") ?? duLieu.phutChuan;duLieu.congDoan = docDong();KhoDuLieu.dungChung.luu(duLieu);dismiss(animated:true,completion:khiDong)}
+
+    required init?(coder: NSCoder) {
+        fatalError("Khong ho tro coder")
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemGroupedBackground
+
+        let dinhDang = DateFormatter()
+        dinhDang.locale = Locale(identifier: "vi_VN")
+        dinhDang.dateStyle = .full
+        title = dinhDang.string(from: ngay).capitalized
+
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "Hủy",
+            style: .plain,
+            target: self,
+            action: #selector(huy)
+        )
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Đóng & lưu",
+            style: .done,
+            target: self,
+            action: #selector(dongLuu)
+        )
+
+        cauHinhGiaoDien()
+        cauHinhBanPhim()
+        capNhatKetQua()
+    }
+
+    private func cauHinhGiaoDien() {
+        batDau.datePickerMode = .time
+        ketThuc.datePickerMode = .time
+        batDau.preferredDatePickerStyle = .compact
+        ketThuc.preferredDatePickerStyle = .compact
+        batDau.date = duLieu.gioBatDau
+        ketThuc.date = duLieu.gioKetThuc
+        nghi.isOn = duLieu.nghiLam
+
+        cauHinhONhap(phutChuan, goiY: "Phút chuẩn")
+        phutChuan.text = String(format: "%.0f", duLieu.phutChuan)
+
+        danhSach.axis = .vertical
+        danhSach.spacing = 10
+        duLieu.congDoan.forEach { themDong($0, tuDongCuon: false) }
+
+        let nutThem = UIButton(type: .system)
+        nutThem.setTitle("＋ Thêm công đoạn", for: .normal)
+        nutThem.addTarget(self, action: #selector(themMoi), for: .touchUpInside)
+
+        ketQua.font = .monospacedDigitSystemFont(ofSize: 28, weight: .bold)
+        ketQua.textAlignment = .center
+        ketQua.textColor = .systemBlue
+
+        noiDung.axis = .vertical
+        noiDung.spacing = 14
+        noiDung.translatesAutoresizingMaskIntoConstraints = false
+        [
+            taoHang("Giờ vào", batDau),
+            taoHang("Giờ về", ketThuc),
+            taoHang("Nghỉ làm", nghi),
+            taoHang("Phút chuẩn", phutChuan),
+            danhSach,
+            nutThem,
+            ketQua
+        ].forEach { noiDung.addArrangedSubview($0) }
+
+        cuon.keyboardDismissMode = .interactive
+        cuon.alwaysBounceVertical = true
+        cuon.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(cuon)
+        cuon.addSubview(noiDung)
+
+        NSLayoutConstraint.activate([
+            cuon.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            cuon.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            cuon.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            cuon.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            noiDung.topAnchor.constraint(equalTo: cuon.contentLayoutGuide.topAnchor, constant: 18),
+            noiDung.bottomAnchor.constraint(equalTo: cuon.contentLayoutGuide.bottomAnchor, constant: -30),
+            noiDung.leadingAnchor.constraint(equalTo: cuon.frameLayoutGuide.leadingAnchor, constant: 18),
+            noiDung.trailingAnchor.constraint(equalTo: cuon.frameLayoutGuide.trailingAnchor, constant: -18)
+        ])
+    }
+
+    private func cauHinhBanPhim() {
+        let chamNen = UITapGestureRecognizer(target: self, action: #selector(tatBanPhim))
+        chamNen.cancelsTouchesInView = false
+        view.addGestureRecognizer(chamNen)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(banPhimHien(_:)),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(banPhimAn(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+
+    private func cauHinhONhap(_ oNhap: UITextField, goiY: String) {
+        oNhap.borderStyle = .roundedRect
+        oNhap.keyboardType = .decimalPad
+        oNhap.placeholder = goiY
+        oNhap.delegate = self
+        oNhap.addTarget(self, action: #selector(duLieuThayDoi), for: .editingChanged)
+
+        let thanh = UIToolbar()
+        thanh.sizeToFit()
+        thanh.items = [
+            UIBarButtonItem(systemItem: .flexibleSpace),
+            UIBarButtonItem(title: "Xong", style: .done, target: self, action: #selector(tatBanPhim))
+        ]
+        oNhap.inputAccessoryView = thanh
+    }
+
+    private func taoHang(_ ten: String, _ noiDung: UIView) -> UIStackView {
+        let nhan = UILabel()
+        nhan.text = ten
+        nhan.font = .systemFont(ofSize: 16, weight: .semibold)
+
+        let hang = UIStackView(arrangedSubviews: [nhan, noiDung])
+        hang.distribution = .equalSpacing
+        hang.alignment = .center
+        return hang
+    }
+
+    private func themDong(_ congDoan: CongDoan, tuDongCuon: Bool) {
+        let soLuong = UITextField()
+        let heSo = UITextField()
+        cauHinhONhap(soLuong, goiY: "Số lượng tờ")
+        cauHinhONhap(heSo, goiY: "Hệ số %")
+        soLuong.text = congDoan.soLuong == 0 ? "" : String(congDoan.soLuong)
+        heSo.text = congDoan.heSo == 0 ? "" : String(congDoan.heSo)
+
+        let nutXoa = UIButton(type: .system)
+        nutXoa.setImage(UIImage(systemName: "minus.circle.fill"), for: .normal)
+        nutXoa.tintColor = .systemRed
+
+        let hang = UIStackView(arrangedSubviews: [soLuong, heSo, nutXoa])
+        hang.spacing = 8
+        soLuong.widthAnchor.constraint(equalTo: heSo.widthAnchor).isActive = true
+
+        nutXoa.addAction(UIAction { [weak self, weak hang] _ in
+            guard let self, let hang else { return }
+            self.danhSach.removeArrangedSubview(hang)
+            hang.removeFromSuperview()
+            self.capNhatKetQua()
+        }, for: .touchUpInside)
+
+        danhSach.addArrangedSubview(hang)
+
+        if tuDongCuon {
+            view.layoutIfNeeded()
+            DispatchQueue.main.async { [weak self, weak soLuong] in
+                guard let self, let soLuong else { return }
+                soLuong.becomeFirstResponder()
+                self.cuon.scrollRectToVisible(
+                    soLuong.convert(soLuong.bounds, to: self.cuon).insetBy(dx: 0, dy: -24),
+                    animated: true
+                )
+            }
+        }
+    }
+
+    private func docSo(_ chuoi: String?) -> Double {
+        Double(chuoi?.replacingOccurrences(of: ",", with: ".") ?? "") ?? 0
+    }
+
+    private func docCongDoan() -> [CongDoan] {
+        danhSach.arrangedSubviews.compactMap { view in
+            guard let hang = view as? UIStackView,
+                  hang.arrangedSubviews.count >= 2,
+                  let soLuong = hang.arrangedSubviews[0] as? UITextField,
+                  let heSo = hang.arrangedSubviews[1] as? UITextField else {
+                return nil
+            }
+            return CongDoan(soLuong: docSo(soLuong.text), heSo: docSo(heSo.text))
+        }
+    }
+
+    private func tinhPhanTram() -> Double {
+        let phut = docSo(phutChuan.text)
+        guard phut > 0 else { return 0 }
+        return docCongDoan().reduce(0) { $0 + $1.soLuong * $1.heSo } / phut * 100
+    }
+
+    private func capNhatKetQua() {
+        ketQua.text = String(format: "%.2f%%", tinhPhanTram())
+    }
+
+    @objc private func themMoi() {
+        themDong(CongDoan(), tuDongCuon: true)
+    }
+
+    @objc private func duLieuThayDoi() {
+        capNhatKetQua()
+    }
+
+    @objc private func tatBanPhim() {
+        view.endEditing(true)
+    }
+
+    @objc private func banPhimHien(_ thongBao: Notification) {
+        guard let khung = thongBao.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let chieuCao = max(0, view.bounds.maxY - view.convert(khung, from: nil).minY)
+        cuon.contentInset.bottom = chieuCao + 12
+        cuon.verticalScrollIndicatorInsets.bottom = chieuCao + 12
+
+        if let oDangNhap {
+            DispatchQueue.main.async { [weak self, weak oDangNhap] in
+                guard let self, let oDangNhap else { return }
+                self.cuon.scrollRectToVisible(
+                    oDangNhap.convert(oDangNhap.bounds, to: self.cuon).insetBy(dx: 0, dy: -24),
+                    animated: true
+                )
+            }
+        }
+    }
+
+    @objc private func banPhimAn(_ thongBao: Notification) {
+        cuon.contentInset.bottom = 0
+        cuon.verticalScrollIndicatorInsets.bottom = 0
+    }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        oDangNhap = textField
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if oDangNhap === textField {
+            oDangNhap = nil
+        }
+    }
+
+    @objc private func huy() {
+        dismiss(animated: true)
+    }
+
+    @objc private func dongLuu() {
+        tatBanPhim()
+        duLieu.gioBatDau = batDau.date
+        duLieu.gioKetThuc = ketThuc.date
+        duLieu.nghiLam = nghi.isOn
+        duLieu.phutChuan = max(0, docSo(phutChuan.text))
+        duLieu.congDoan = docCongDoan()
+        duLieu.phanTram = tinhPhanTram()
+        duLieu.daTinh = duLieu.congDoan.contains { $0.soLuong != 0 || $0.heSo != 0 }
+        KhoDuLieu.dungChung.luu(duLieu)
+        dismiss(animated: true, completion: khiDong)
+    }
 }

@@ -26,7 +26,6 @@ jobs:
       - name: Build ung dung
         run: |
           set -e
-
           xcodebuild \
             -project TinhCongSanLuong.xcodeproj \
             -scheme TinhCongSanLuong \
@@ -40,29 +39,14 @@ jobs:
       - name: Dong goi IPA
         run: |
           set -e
-
           APP_PATH="DerivedData/Build/Products/Release-iphoneos/TinhCongSanLuong.app"
           IPA_PATH="TinhCongSanLuong-unsigned.ipa"
-
-          if [ ! -d "$APP_PATH" ]; then
-            echo "Khong tim thay file ung dung tai: $APP_PATH"
-            exit 1
-          fi
-
-          rm -rf Payload
-          rm -f "$IPA_PATH"
-
+          test -d "$APP_PATH"
+          rm -rf Payload "$IPA_PATH"
           mkdir -p Payload
           cp -R "$APP_PATH" Payload/
-
           zip -qry "$IPA_PATH" Payload
-
-          if [ ! -f "$IPA_PATH" ]; then
-            echo "Khong tao duoc file IPA"
-            exit 1
-          fi
-
-          echo "Da tao IPA:"
+          test -f "$IPA_PATH"
           ls -lh "$IPA_PATH"
 
       - name: Tao thong tin phien ban
@@ -70,9 +54,7 @@ jobs:
         shell: bash
         run: |
           TAG="v$(date +'%Y.%m.%d')-${GITHUB_RUN_NUMBER}"
-
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Ten phien ban: $TAG"
 
       - name: Luu IPA vao Artifact
         uses: actions/upload-artifact@v4
@@ -86,15 +68,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: Tính Công Sản Lượng ${{ steps.version.outputs.tag }}
+          name: Tinh Cong San Luong ${{ steps.version.outputs.tag }}
           target_commitish: ${{ github.sha }}
           body: |
             Bản IPA chưa ký dành cho iPhone.
+            Unsigned IPA for iPhone.
 
-            Tải file TinhCongSanLuong-unsigned.ipa trong phần Assets,
-            sau đó ký và cài đặt bằng ESign.
-          files: |
-            TinhCongSanLuong-unsigned.ipa
+            Tải IPA trong Assets rồi ký bằng ESign.
+            Download the IPA from Assets and sign it with ESign.
+          files: TinhCongSanLuong-unsigned.ipa
           fail_on_unmatched_files: true
           make_latest: true
         env:
