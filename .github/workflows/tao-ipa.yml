@@ -74,7 +74,7 @@ jobs:
             Bản IPA chưa ký dành cho iPhone.
             Unsigned IPA for iPhone.
 
-            Tách Công đoạn dư khỏi dữ liệu tính sản lượng ngày; chỉ cộng dồn khi nhập trong màn hình Công đoạn dư.
+            Công đoạn dư hỗ trợ cộng hoặc trừ có kiểm tra số âm và hiển thị tổng hợp khi mở.
             Updated hour statistics, average productivity, current-day highlight, and lunar calendar.
 
             Tải IPA trong Assets rồi ký bằng ESign.

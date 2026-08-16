@@ -11,7 +11,7 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
         title = "Công đoạn dư"
         view.backgroundColor = .systemGroupedBackground
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Hủy", style: .plain, target: self, action: #selector(huy))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Cộng dồn", style: .done, target: self, action: #selector(luu))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Thực hiện", style: .done, target: self, action: #selector(luu))
         taoGiaoDien()
         taoBanPhim()
     }
@@ -19,8 +19,13 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
     deinit { NotificationCenter.default.removeObserver(self) }
 
     private func taoGiaoDien() {
+        let tongHop = UILabel()
+        tongHop.numberOfLines = 0
+        tongHop.font = .monospacedDigitSystemFont(ofSize: 14, weight: .semibold)
+        let du = KhoCongDoanDu.dungChung.danhSach
+        tongHop.text = du.isEmpty ? "TỔNG HỢP CÔNG ĐOẠN DƯ\nChưa có dữ liệu" : (["TỔNG HỢP CÔNG ĐOẠN DƯ"] + du.map { "\($0.soLuong.chuoiGon) tờ  |  \($0.heSo.chuoiGon)%" }).joined(separator: "\n")
         let moTa = UILabel()
-        moTa.text = "Nhập số tờ và phần trăm. Mỗi lần bấm Cộng dồn, dữ liệu sẽ được cộng vào đúng loại phần trăm tương ứng."
+        moTa.text = "Nhập số dương để cộng, nhập dấu - phía trước để trừ. Không cho phép kết quả âm."
         moTa.font = .systemFont(ofSize: 13)
         moTa.textColor = .secondaryLabel
         moTa.numberOfLines = 0
@@ -35,7 +40,7 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
         noiDung.axis = .vertical
         noiDung.spacing = 14
         noiDung.translatesAutoresizingMaskIntoConstraints = false
-        [moTa, taoTieuDeCot(), danhSach, nutThem].forEach { noiDung.addArrangedSubview($0) }
+        [tongHop, moTa, taoTieuDeCot(), danhSach, nutThem].forEach { noiDung.addArrangedSubview($0) }
         cuon.keyboardDismissMode = .interactive
         cuon.alwaysBounceVertical = true
         cuon.translatesAutoresizingMaskIntoConstraints = false

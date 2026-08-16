@@ -42,31 +42,17 @@ final class KhoCongDoanDu {
     static let dungChung = KhoCongDoanDu()
     private let khoa = "cong-doan-du-v3-doc-lap"
     private(set) var danhSach: [CongDoanDu] = []
-
-    private init() { doc() }
-
-    private func doc() {
-        guard let duLieu = UserDefaults.standard.data(forKey: khoa),
-              let giaTri = try? JSONDecoder().decode([CongDoanDu].self, from: duLieu) else { return }
-        danhSach = giaTri
-    }
-
-    func congDon(_ cacDong: [CongDoan]) {
+    private init() { if let d = UserDefaults.standard.data(forKey: khoa), let v = try? JSONDecoder().decode([CongDoanDu].self, from: d) { danhSach = v.sorted { $0.heSo < $1.heSo } } }
+    func thuCongDon(_ ds: [CongDoan]) -> String? {
         var bang = Dictionary(uniqueKeysWithValues: danhSach.map { ($0.heSo, $0.soLuong) })
-        for dong in cacDong where dong.heSo > 0 && dong.soLuong != 0 {
-            bang[dong.heSo, default: 0] += dong.soLuong
+        for d in ds where d.heSo > 0 && d.soLuong != 0 {
+            let cu = bang[d.heSo, default: 0], moi = cu + d.soLuong
+            if moi < -0.000001 { return "Loại \(d.heSo.chuoiGon)% chỉ còn \(cu.chuoiGon) tờ, không thể trừ \((-d.soLuong).chuoiGon) tờ." }
+            bang[d.heSo] = max(0, moi)
         }
-        ganBang(bang)
-    }
-
-    private func ganBang(_ bang: [Double: Double]) {
-        danhSach = bang
-            .filter { abs($0.value) > 0.000001 }
-            .map { CongDoanDu(heSo: $0.key, soLuong: $0.value) }
-            .sorted { $0.heSo < $1.heSo }
-        if let duLieu = try? JSONEncoder().encode(danhSach) {
-            UserDefaults.standard.set(duLieu, forKey: khoa)
-        }
+        danhSach = bang.filter { $0.value > 0.000001 }.map { CongDoanDu(heSo: $0.key, soLuong: $0.value) }.sorted { $0.heSo < $1.heSo }
+        if let d = try? JSONEncoder().encode(danhSach) { UserDefaults.standard.set(d, forKey: khoa) }
+        return nil
     }
 }
 
