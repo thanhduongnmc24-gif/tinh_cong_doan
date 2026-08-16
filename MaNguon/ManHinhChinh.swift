@@ -112,13 +112,11 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             noiDungTongHop.topAnchor.constraint(equalTo: chonTab.bottomAnchor, constant: 3),
             noiDungTongHop.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             noiDungTongHop.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            noiDungTongHop.heightAnchor.constraint(equalToConstant: 150),
-            noiDungTongHop.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4),
+            noiDungTongHop.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4),
             bangCongDoanDu.topAnchor.constraint(equalTo: chonTab.bottomAnchor, constant: 3),
             bangCongDoanDu.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             bangCongDoanDu.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            bangCongDoanDu.heightAnchor.constraint(equalToConstant: 150),
-            bangCongDoanDu.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4)
+            bangCongDoanDu.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4)
         ])
     }
 
@@ -129,7 +127,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         tieuDeThang.text = dinhDang.string(from: thang).capitalized
         let soO = TienIchNgay.soNgay(thang) + TienIchNgay.lich.component(.weekday, from: thang) - 1
         let soHang = Int(ceil(Double(soO) / 7.0))
-        rangBuocChieuCaoLich.constant = CGFloat(soHang * 55 + max(0, soHang - 1) * 5 + 2)
+        rangBuocChieuCaoLich.constant = CGFloat(soHang * 55 + max(0, soHang - 1) * 7 + 4)
         luoi.collectionViewLayout.invalidateLayout()
         luoi.reloadData()
         capNhatTab()
