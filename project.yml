@@ -1,0 +1,45 @@
+name: TinhCongSanLuong
+options:
+  bundleIdPrefix: com.thanhduong
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+    GENERATE_INFOPLIST_FILE: NO
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+targets:
+  TinhCongSanLuong:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: MaNguon
+      - path: TaiNguyen
+        excludes:
+          - ThongTin.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.thanhduong.tinhcongsanluong
+        PRODUCT_NAME: TinhCongSanLuong
+        INFOPLIST_FILE: TaiNguyen/ThongTin.plist
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 1.0.0
+        ENABLE_BITCODE: NO
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: ""
+schemes:
+  TinhCongSanLuong:
+    build:
+      targets:
+        TinhCongSanLuong: all
+    run:
+      config: Debug
+    archive:
+      config: Release
