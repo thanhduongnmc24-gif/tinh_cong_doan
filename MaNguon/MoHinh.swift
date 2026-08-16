@@ -126,7 +126,7 @@ enum TienIchNgay {
         lichAm.timeZone = .current
         let thanhPhan = lichAm.dateComponents([.day, .month], from: ngay)
         guard let ngayAm = thanhPhan.day, let thangAm = thanhPhan.month else { return "" }
-        return ngayAm == 1 ? "1/\(thangAm) AL" : "\(ngayAm) AL"
+        return ngayAm == 1 ? "1/\(thangAm)" : "\(ngayAm)"
     }
 
     static func taoGio(ngay: Date, gio: Int, phut: Int) -> Date {
