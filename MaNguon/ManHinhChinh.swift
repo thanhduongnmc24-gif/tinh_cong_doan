@@ -6,6 +6,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
     private let tieuDeThongKe = UILabel()
     private let chonTab = UISegmentedControl(items: ["Thống kê", "Công đoạn dư"])
     private let noiDungTongHop = UILabel()
+    private var rangBuocChieuCaoLich: NSLayoutConstraint!
 
     private lazy var luoi: UICollectionView = {
         let boCuc = UICollectionViewFlowLayout()
@@ -80,6 +81,8 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             view.addSubview($0)
         }
 
+        rangBuocChieuCaoLich = luoi.heightAnchor.constraint(equalToConstant: 390)
+
         NSLayoutConstraint.activate([
             hangThang.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
             hangThang.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -90,7 +93,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             luoi.topAnchor.constraint(equalTo: hangThu.bottomAnchor, constant: 5),
             luoi.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             luoi.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-            luoi.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.40),
+            rangBuocChieuCaoLich,
             tieuDeThongKe.topAnchor.constraint(equalTo: luoi.bottomAnchor, constant: 2),
             tieuDeThongKe.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             tieuDeThongKe.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
@@ -109,6 +112,10 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         dinhDang.locale = Locale(identifier: "vi_VN")
         dinhDang.dateFormat = "'Tháng' M yyyy"
         tieuDeThang.text = dinhDang.string(from: thang).capitalized
+        let soO = TienIchNgay.soNgay(thang) + TienIchNgay.lich.component(.weekday, from: thang) - 1
+        let soHang = Int(ceil(Double(soO) / 7.0))
+        rangBuocChieuCaoLich.constant = CGFloat(soHang * 72 + max(0, soHang - 1) * 7)
+        luoi.collectionViewLayout.invalidateLayout()
         luoi.reloadData()
         capNhatTab()
     }
@@ -190,6 +197,6 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let rong = floor((collectionView.bounds.width - 42) / 7)
-        return CGSize(width: rong, height: max(48, floor(collectionView.bounds.height / 6) - 6))
+        return CGSize(width: rong, height: 72)
     }
 }

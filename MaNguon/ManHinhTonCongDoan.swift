@@ -89,6 +89,15 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
     private func themDong(tuDongNhap: Bool) {
         let soTo = UITextField(), phanTram = UITextField(), xoa = UIButton(type: .system)
         cauHinh(soTo, goiY: "Số tờ")
+        soTo.keyboardType = .numbersAndPunctuation
+        let thanhSoTo = UIToolbar()
+        thanhSoTo.sizeToFit()
+        thanhSoTo.items = [
+            UIBarButtonItem(title: "−", style: .plain, target: self, action: #selector(chenDauTru)),
+            UIBarButtonItem(systemItem: .flexibleSpace),
+            UIBarButtonItem(title: "Xong", style: .done, target: self, action: #selector(tatBanPhim))
+        ]
+        soTo.inputAccessoryView = thanhSoTo
         cauHinh(phanTram, goiY: "%")
         xoa.setImage(UIImage(systemName: "minus.circle.fill"), for: .normal)
         xoa.tintColor = .systemRed
@@ -121,7 +130,10 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
     }
 
     private func docSo(_ chuoi: String?) -> Double {
-        Double(chuoi?.replacingOccurrences(of: ",", with: ".") ?? "") ?? 0
+        let chuanHoa = chuoi?
+            .replacingOccurrences(of: ",", with: ".")
+            .replacingOccurrences(of: "−", with: "-") ?? ""
+        return Double(chuanHoa) ?? 0
     }
 
     private func docDanhSach() -> [CongDoan] {
@@ -135,6 +147,15 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
     }
 
     @objc private func themMoi() { themDong(tuDongNhap: true) }
+    @objc private func chenDauTru() {
+        guard let oDangNhap else { return }
+        let hienTai = oDangNhap.text ?? ""
+        if hienTai.hasPrefix("-") || hienTai.hasPrefix("−") {
+            oDangNhap.text = String(hienTai.dropFirst())
+        } else {
+            oDangNhap.text = "-" + hienTai
+        }
+    }
     @objc private func tatBanPhim() { view.endEditing(true) }
     @objc private func banPhimHien(_ thongBao: Notification) {
         guard let khung = thongBao.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
