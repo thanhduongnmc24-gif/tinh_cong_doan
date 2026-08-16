@@ -58,13 +58,13 @@ final class KhoDuLieu {
 
 enum TienIchNgay {
     static var lich: Calendar { var c = Calendar(identifier: .gregorian); c.locale = Locale(identifier: "vi_VN"); c.timeZone = .current; return c }
-    static let khoa: DateFormatter = { let f=DateFormatter(); f.calendar=lich; f.locale=Locale(identifier:"vi_VN"); f.dateFormat="yyyy-MM-dd"; return f }()
+    static let khoa: DateFormatter = { let f = DateFormatter(); f.calendar = lich; f.locale = Locale(identifier:"vi_VN"); f.dateFormat = "yyyy-MM-dd"; return f }()
     static func dauThang(_ d: Date) -> Date { lich.date(from: lich.dateComponents([.year,.month], from:d))! }
     static func soNgay(_ d: Date) -> Int { lich.range(of:.day, in:.month, for:d)!.count }
     static func laChuNhat(_ d: Date) -> Bool { lich.component(.weekday, from:d) == 1 }
     static func taoGio(ngay: Date, gio: Int, phut: Int) -> Date { lich.date(bySettingHour:gio, minute:phut, second:0, of:ngay)! }
     static func macDinh(_ ngay: Date) -> DuLieuNgay {
-        let c=KhoDuLieu.dungChung.caiDat
+        let c = KhoDuLieu.dungChung.caiDat
         return DuLieuNgay(khoaNgay:khoa.string(from:ngay), gioBatDau:taoGio(ngay:ngay,gio:c.gioBatDau,phut:c.phutBatDau), gioKetThuc:taoGio(ngay:ngay,gio:c.gioKetThuc,phut:c.phutKetThuc), nghiPhut:c.nghiPhut, nghiLam:laChuNhat(ngay), phutChuan:c.phutChuan, congDoan:[CongDoan()], phanTram:0, daTinh:false)
     }
 }
