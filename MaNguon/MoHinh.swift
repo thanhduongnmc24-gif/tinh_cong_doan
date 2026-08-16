@@ -21,7 +21,6 @@ struct DuLieuNgay: Codable {
         if nghiLam { return 0 }
         return max(0, Int(gioKetThuc.timeIntervalSince(gioBatDau) / 60) - nghiPhut)
     }
-    var soCong: Double { Double(phutLam) / 480.0 }
 }
 
 struct CaiDat: Codable {
@@ -34,34 +33,118 @@ struct CaiDat: Codable {
     var mucTieuThang = 100.0
 }
 
+struct CongDoanDu: Codable, Hashable {
+    var heSo: Double
+    var soLuong: Double
+}
+
+final class KhoCongDoanDu {
+    static let dungChung = KhoCongDoanDu()
+    private let khoa = "cong-doan-du-v2"
+    private(set) var danhSach: [CongDoanDu] = []
+
+    private init() { doc() }
+
+    private func doc() {
+        guard let duLieu = UserDefaults.standard.data(forKey: khoa),
+              let giaTri = try? JSONDecoder().decode([CongDoanDu].self, from: duLieu) else { return }
+        danhSach = giaTri
+    }
+
+    func congDon(_ cacDong: [CongDoan]) {
+        var bang = Dictionary(uniqueKeysWithValues: danhSach.map { ($0.heSo, $0.soLuong) })
+        for dong in cacDong where dong.heSo > 0 && dong.soLuong != 0 {
+            bang[dong.heSo, default: 0] += dong.soLuong
+        }
+        ganBang(bang)
+    }
+
+    func capNhat(duLieuCu: [CongDoan], duLieuMoi: [CongDoan]) {
+        var bang = Dictionary(uniqueKeysWithValues: danhSach.map { ($0.heSo, $0.soLuong) })
+        for dong in duLieuCu where dong.heSo > 0 && dong.soLuong != 0 {
+            bang[dong.heSo, default: 0] -= dong.soLuong
+        }
+        for dong in duLieuMoi where dong.heSo > 0 && dong.soLuong != 0 {
+            bang[dong.heSo, default: 0] += dong.soLuong
+        }
+        ganBang(bang)
+    }
+
+    private func ganBang(_ bang: [Double: Double]) {
+        danhSach = bang
+            .filter { abs($0.value) > 0.000001 }
+            .map { CongDoanDu(heSo: $0.key, soLuong: $0.value) }
+            .sorted { $0.heSo < $1.heSo }
+        if let duLieu = try? JSONEncoder().encode(danhSach) {
+            UserDefaults.standard.set(duLieu, forKey: khoa)
+        }
+    }
+}
+
 final class KhoDuLieu {
     static let dungChung = KhoDuLieu()
     private let khoaNgay = "du-lieu-ngay-v1"
     private let khoaCaiDat = "cai-dat-v1"
     private(set) var cacNgay: [String: DuLieuNgay] = [:]
     var caiDat = CaiDat()
+
     private init() { doc() }
+
     func doc() {
-        let d = UserDefaults.standard
-        if let x = d.data(forKey: khoaNgay), let v = try? JSONDecoder().decode([String: DuLieuNgay].self, from: x) { cacNgay = v }
-        if let x = d.data(forKey: khoaCaiDat), let v = try? JSONDecoder().decode(CaiDat.self, from: x) { caiDat = v }
+        let macDinh = UserDefaults.standard
+        if let duLieu = macDinh.data(forKey: khoaNgay),
+           let giaTri = try? JSONDecoder().decode([String: DuLieuNgay].self, from: duLieu) {
+            cacNgay = giaTri
+        }
+        if let duLieu = macDinh.data(forKey: khoaCaiDat),
+           let giaTri = try? JSONDecoder().decode(CaiDat.self, from: duLieu) {
+            caiDat = giaTri
+        }
     }
+
     func luu(_ ngay: DuLieuNgay) {
         cacNgay[ngay.khoaNgay] = ngay
-        if let x = try? JSONEncoder().encode(cacNgay) { UserDefaults.standard.set(x, forKey: khoaNgay) }
+        if let duLieu = try? JSONEncoder().encode(cacNgay) {
+            UserDefaults.standard.set(duLieu, forKey: khoaNgay)
+        }
     }
+
     func luuCaiDat(_ moi: CaiDat) {
         caiDat = moi
-        if let x = try? JSONEncoder().encode(moi) { UserDefaults.standard.set(x, forKey: khoaCaiDat) }
+        if let duLieu = try? JSONEncoder().encode(moi) {
+            UserDefaults.standard.set(duLieu, forKey: khoaCaiDat)
+        }
     }
 }
 
 enum TienIchNgay {
-    static var lich: Calendar { var c = Calendar(identifier: .gregorian); c.locale = Locale(identifier: "vi_VN"); c.timeZone = .current; return c }
-    static let khoa: DateFormatter = { let f = DateFormatter(); f.calendar = lich; f.locale = Locale(identifier:"vi_VN"); f.dateFormat = "yyyy-MM-dd"; return f }()
-    static func dauThang(_ d: Date) -> Date { lich.date(from: lich.dateComponents([.year,.month], from:d))! }
-    static func soNgay(_ d: Date) -> Int { lich.range(of:.day, in:.month, for:d)!.count }
-    static func laChuNhat(_ d: Date) -> Bool { lich.component(.weekday, from:d) == 1 }
+    static var lich: Calendar {
+        var lich = Calendar(identifier: .gregorian)
+        lich.locale = Locale(identifier: "vi_VN")
+        lich.timeZone = .current
+        return lich
+    }
+
+    static let khoa: DateFormatter = {
+        let dinhDang = DateFormatter()
+        dinhDang.calendar = lich
+        dinhDang.locale = Locale(identifier: "vi_VN")
+        dinhDang.dateFormat = "yyyy-MM-dd"
+        return dinhDang
+    }()
+
+    static func dauThang(_ ngay: Date) -> Date {
+        lich.date(from: lich.dateComponents([.year, .month], from: ngay))!
+    }
+
+    static func soNgay(_ ngay: Date) -> Int {
+        lich.range(of: .day, in: .month, for: ngay)!.count
+    }
+
+    static func laChuNhat(_ ngay: Date) -> Bool {
+        lich.component(.weekday, from: ngay) == 1
+    }
+
     static func chuNgayAm(_ ngay: Date) -> String {
         var lichAm = Calendar(identifier: .chinese)
         lichAm.locale = Locale(identifier: "vi_VN")
@@ -70,31 +153,24 @@ enum TienIchNgay {
         guard let ngayAm = thanhPhan.day, let thangAm = thanhPhan.month else { return "" }
         return ngayAm == 1 ? "1/\(thangAm) AL" : "\(ngayAm) AL"
     }
-    static func taoGio(ngay: Date, gio: Int, phut: Int) -> Date { lich.date(bySettingHour:gio, minute:phut, second:0, of:ngay)! }
+
+    static func taoGio(ngay: Date, gio: Int, phut: Int) -> Date {
+        lich.date(bySettingHour: gio, minute: phut, second: 0, of: ngay)!
+    }
+
     static func macDinh(_ ngay: Date) -> DuLieuNgay {
-        let c = KhoDuLieu.dungChung.caiDat
-        return DuLieuNgay(khoaNgay:khoa.string(from:ngay), gioBatDau:taoGio(ngay:ngay,gio:c.gioBatDau,phut:c.phutBatDau), gioKetThuc:taoGio(ngay:ngay,gio:c.gioKetThuc,phut:c.phutKetThuc), nghiPhut:c.nghiPhut, nghiLam:laChuNhat(ngay), phutChuan:c.phutChuan, congDoan:[CongDoan()], phanTram:0, daTinh:false)
-    }
-}
-
-
-struct TonCongDoan: Codable, Hashable {
-    var ma = UUID()
-    var tenLoai: String = ""
-    var soTo: Double = 0
-}
-
-final class KhoTonCongDoan {
-    static let dungChung = KhoTonCongDoan()
-    private let khoa = "ton-cong-doan-v1"
-    private(set) var danhSach: [TonCongDoan] = []
-    private init() {
-        if let duLieu = UserDefaults.standard.data(forKey: khoa),
-           let giaTri = try? JSONDecoder().decode([TonCongDoan].self, from: duLieu) { danhSach = giaTri }
-    }
-    func luu(_ moi: [TonCongDoan]) {
-        danhSach = moi
-        if let duLieu = try? JSONEncoder().encode(moi) { UserDefaults.standard.set(duLieu, forKey: khoa) }
+        let caiDat = KhoDuLieu.dungChung.caiDat
+        return DuLieuNgay(
+            khoaNgay: khoa.string(from: ngay),
+            gioBatDau: taoGio(ngay: ngay, gio: caiDat.gioBatDau, phut: caiDat.phutBatDau),
+            gioKetThuc: taoGio(ngay: ngay, gio: caiDat.gioKetThuc, phut: caiDat.phutKetThuc),
+            nghiPhut: caiDat.nghiPhut,
+            nghiLam: laChuNhat(ngay),
+            phutChuan: caiDat.phutChuan,
+            congDoan: [CongDoan()],
+            phanTram: 0,
+            daTinh: false
+        )
     }
 }
 

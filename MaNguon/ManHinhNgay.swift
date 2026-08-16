@@ -81,7 +81,7 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
 
         let nutTon = UIButton(type: .system)
         var cauHinhTon = UIButton.Configuration.tinted()
-        cauHinhTon.title = "Nhập số tờ hiện có"
+        cauHinhTon.title = "Công đoạn dư"
         cauHinhTon.image = UIImage(systemName: "tray.full.fill")
         cauHinhTon.imagePadding = 8
         nutTon.configuration = cauHinhTon
@@ -311,9 +311,12 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
         duLieu.gioKetThuc = ketThuc.date
         duLieu.nghiLam = nghi.isOn
         duLieu.phutChuan = max(0, docSo(phutChuan.text))
-        duLieu.congDoan = docCongDoan()
+        let congDoanCu = duLieu.congDoan
+        let congDoanMoi = docCongDoan()
+        duLieu.congDoan = congDoanMoi
         duLieu.phanTram = tinhPhanTram()
-        duLieu.daTinh = duLieu.congDoan.contains { $0.soLuong != 0 || $0.heSo != 0 }
+        duLieu.daTinh = congDoanMoi.contains { $0.soLuong != 0 || $0.heSo != 0 }
+        KhoCongDoanDu.dungChung.capNhat(duLieuCu: congDoanCu, duLieuMoi: congDoanMoi)
         KhoDuLieu.dungChung.luu(duLieu)
         dismiss(animated: true, completion: khiDong)
     }
