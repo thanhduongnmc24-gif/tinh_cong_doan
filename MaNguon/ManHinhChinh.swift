@@ -26,10 +26,10 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
     private func thongKe(){let homNay = Date(),lich = TienIchNgay.lich;var cong = 0.0,phanTram = 0.0,ngayChuanThang = 0,ngayCon = 0
         for n in 0..<TienIchNgay.soNgay(thang){
             let d = lich.date(byAdding:.day,value:n,to:thang)!
-            if !TienIchNgay.laChuNhat(d) { ngayChuanThang + = 1; if d > homNay { ngayCon + = 1 } }
+            if !TienIchNgay.laChuNhat(d) { ngayChuanThang += 1; if d > homNay { ngayCon += 1 } }
             if d <= homNay {
                 let x = KhoDuLieu.dungChung.cacNgay[TienIchNgay.khoa.string(from:d)] ?? TienIchNgay.macDinh(d)
-                cong + = x.soCong; phanTram + = x.phanTram
+                cong += x.soCong; phanTram += x.phanTram
             }
         }
         let congChuan = Double(ngayChuanThang),thieu = max(0,congChuan-cong),muc = KhoDuLieu.dungChung.caiDat.mucTieuThang,conThieu = max(0,muc-phanTram),moiNgay = ngayCon>0 ? conThieu/Double(ngayCon):conThieu
