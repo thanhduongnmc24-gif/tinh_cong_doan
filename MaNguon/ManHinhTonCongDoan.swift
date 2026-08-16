@@ -149,7 +149,21 @@ final class ManHinhTonCongDoan: UIViewController, UITextFieldDelegate {
     @objc private func huy() { dismiss(animated: true) }
     @objc private func luu() {
         tatBanPhim()
-        KhoCongDoanDu.dungChung.congDon(docDanhSach())
+        let thayDoi = docDanhSach()
+        guard !thayDoi.isEmpty else {
+            hienLoi("Hãy nhập ít nhất một dòng hợp lệ.")
+            return
+        }
+        if let loi = KhoCongDoanDu.dungChung.thuCongDon(thayDoi) {
+            hienLoi(loi)
+            return
+        }
         dismiss(animated: true)
+    }
+
+    private func hienLoi(_ noiDung: String) {
+        let hopThoai = UIAlertController(title: "Không thể thực hiện", message: noiDung, preferredStyle: .alert)
+        hopThoai.addAction(UIAlertAction(title: "Đóng", style: .default))
+        present(hopThoai, animated: true)
     }
 }
