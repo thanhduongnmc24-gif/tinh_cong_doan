@@ -74,6 +74,9 @@ jobs:
             Bản IPA chưa ký dành cho iPhone.
             Unsigned IPA for iPhone.
 
+            Cập nhật thống kê giờ, sản lượng trung bình, ngày hiện tại và lịch âm.
+            Updated hour statistics, average productivity, current-day highlight, and lunar calendar.
+
             Tải IPA trong Assets rồi ký bằng ESign.
             Download the IPA from Assets and sign it with ESign.
           files: TinhCongSanLuong-unsigned.ipa

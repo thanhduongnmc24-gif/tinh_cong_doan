@@ -62,6 +62,14 @@ enum TienIchNgay {
     static func dauThang(_ d: Date) -> Date { lich.date(from: lich.dateComponents([.year,.month], from:d))! }
     static func soNgay(_ d: Date) -> Int { lich.range(of:.day, in:.month, for:d)!.count }
     static func laChuNhat(_ d: Date) -> Bool { lich.component(.weekday, from:d) == 1 }
+    static func chuNgayAm(_ ngay: Date) -> String {
+        var lichAm = Calendar(identifier: .chinese)
+        lichAm.locale = Locale(identifier: "vi_VN")
+        lichAm.timeZone = .current
+        let thanhPhan = lichAm.dateComponents([.day, .month], from: ngay)
+        guard let ngayAm = thanhPhan.day, let thangAm = thanhPhan.month else { return "" }
+        return ngayAm == 1 ? "1/\(thangAm) AL" : "\(ngayAm) AL"
+    }
     static func taoGio(ngay: Date, gio: Int, phut: Int) -> Date { lich.date(bySettingHour:gio, minute:phut, second:0, of:ngay)! }
     static func macDinh(_ ngay: Date) -> DuLieuNgay {
         let c = KhoDuLieu.dungChung.caiDat
