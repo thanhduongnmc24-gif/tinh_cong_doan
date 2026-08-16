@@ -123,7 +123,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         tieuDeThang.text = dinhDang.string(from: thang).capitalized
         let soO = TienIchNgay.soNgay(thang) + TienIchNgay.lich.component(.weekday, from: thang) - 1
         let soHang = Int(ceil(Double(soO) / 7.0))
-        rangBuocChieuCaoLich.constant = CGFloat(soHang * 66 + max(0, soHang - 1) * 5)
+        rangBuocChieuCaoLich.constant = CGFloat(soHang * 60 + max(0, soHang - 1) * 5)
         luoi.collectionViewLayout.invalidateLayout()
         luoi.reloadData()
         capNhatTab()
@@ -207,6 +207,6 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let rong = floor((collectionView.bounds.width - 42) / 7)
-        return CGSize(width: rong, height: 66)
+        return CGSize(width: rong, height: 60)
     }
 }
