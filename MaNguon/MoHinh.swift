@@ -76,3 +76,33 @@ enum TienIchNgay {
         return DuLieuNgay(khoaNgay:khoa.string(from:ngay), gioBatDau:taoGio(ngay:ngay,gio:c.gioBatDau,phut:c.phutBatDau), gioKetThuc:taoGio(ngay:ngay,gio:c.gioKetThuc,phut:c.phutKetThuc), nghiPhut:c.nghiPhut, nghiLam:laChuNhat(ngay), phutChuan:c.phutChuan, congDoan:[CongDoan()], phanTram:0, daTinh:false)
     }
 }
+
+
+struct TonCongDoan: Codable, Hashable {
+    var ma = UUID()
+    var tenLoai: String = ""
+    var soTo: Double = 0
+}
+
+final class KhoTonCongDoan {
+    static let dungChung = KhoTonCongDoan()
+    private let khoa = "ton-cong-doan-v1"
+    private(set) var danhSach: [TonCongDoan] = []
+    private init() {
+        if let duLieu = UserDefaults.standard.data(forKey: khoa),
+           let giaTri = try? JSONDecoder().decode([TonCongDoan].self, from: duLieu) { danhSach = giaTri }
+    }
+    func luu(_ moi: [TonCongDoan]) {
+        danhSach = moi
+        if let duLieu = try? JSONEncoder().encode(moi) { UserDefaults.standard.set(duLieu, forKey: khoa) }
+    }
+}
+
+extension Double {
+    var chuoiGon: String {
+        if rounded() == self { return String(format: "%.0f", self) }
+        return String(format: "%.4f", self)
+            .replacingOccurrences(of: "0+$", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\\.$", with: "", options: .regularExpression)
+    }
+}

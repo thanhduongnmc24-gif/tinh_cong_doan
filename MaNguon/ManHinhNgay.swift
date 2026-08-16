@@ -73,9 +73,19 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
         danhSach.spacing = 10
         duLieu.congDoan.forEach { themDong($0, tuDongCuon: false) }
 
+        let tieuDeCot = taoTieuDeCot()
+
         let nutThem = UIButton(type: .system)
         nutThem.setTitle("＋ Thêm công đoạn", for: .normal)
         nutThem.addTarget(self, action: #selector(themMoi), for: .touchUpInside)
+
+        let nutTon = UIButton(type: .system)
+        var cauHinhTon = UIButton.Configuration.tinted()
+        cauHinhTon.title = "Nhập số tờ hiện có"
+        cauHinhTon.image = UIImage(systemName: "tray.full.fill")
+        cauHinhTon.imagePadding = 8
+        nutTon.configuration = cauHinhTon
+        nutTon.addTarget(self, action: #selector(moTonCongDoan), for: .touchUpInside)
 
         ketQua.font = .monospacedDigitSystemFont(ofSize: 28, weight: .bold)
         ketQua.textAlignment = .center
@@ -89,8 +99,10 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
             taoHang("Giờ về", ketThuc),
             taoHang("Nghỉ làm", nghi),
             taoHang("Phút chuẩn", phutChuan),
+            tieuDeCot,
             danhSach,
             nutThem,
+            nutTon,
             ketQua
         ].forEach { noiDung.addArrangedSubview($0) }
 
@@ -147,6 +159,23 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
         oNhap.inputAccessoryView = thanh
     }
 
+    private func taoTieuDeCot() -> UIStackView {
+        let soTo = UILabel()
+        soTo.text = "Số tờ"
+        soTo.font = .systemFont(ofSize: 13, weight: .bold)
+        soTo.textAlignment = .center
+        let phanTram = UILabel()
+        phanTram.text = "Phần trăm"
+        phanTram.font = .systemFont(ofSize: 13, weight: .bold)
+        phanTram.textAlignment = .center
+        let choXoa = UIView()
+        choXoa.widthAnchor.constraint(equalToConstant: 42).isActive = true
+        let hang = UIStackView(arrangedSubviews: [soTo, phanTram, choXoa])
+        hang.spacing = 8
+        soTo.widthAnchor.constraint(equalTo: phanTram.widthAnchor).isActive = true
+        return hang
+    }
+
     private func taoHang(_ ten: String, _ noiDung: UIView) -> UIStackView {
         let nhan = UILabel()
         nhan.text = ten
@@ -163,13 +192,14 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
         let heSo = UITextField()
         cauHinhONhap(soLuong, goiY: "Số lượng tờ")
         cauHinhONhap(heSo, goiY: "Hệ số %")
-        soLuong.text = congDoan.soLuong == 0 ? "" : String(congDoan.soLuong)
-        heSo.text = congDoan.heSo == 0 ? "" : String(congDoan.heSo)
+        soLuong.text = congDoan.soLuong == 0 ? "" : congDoan.soLuong.chuoiGon
+        heSo.text = congDoan.heSo == 0 ? "" : congDoan.heSo.chuoiGon
 
         let nutXoa = UIButton(type: .system)
         nutXoa.setImage(UIImage(systemName: "minus.circle.fill"), for: .normal)
         nutXoa.tintColor = .systemRed
 
+        nutXoa.widthAnchor.constraint(equalToConstant: 42).isActive = true
         let hang = UIStackView(arrangedSubviews: [soLuong, heSo, nutXoa])
         hang.spacing = 8
         soLuong.widthAnchor.constraint(equalTo: heSo.widthAnchor).isActive = true
@@ -224,6 +254,11 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
 
     @objc private func themMoi() {
         themDong(CongDoan(), tuDongCuon: true)
+    }
+
+    @objc private func moTonCongDoan() {
+        tatBanPhim()
+        present(UINavigationController(rootViewController: ManHinhTonCongDoan()), animated: true)
     }
 
     @objc private func duLieuThayDoi() {
