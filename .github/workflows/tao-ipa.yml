@@ -20,6 +20,56 @@ jobs:
       - name: Cai XcodeGen
         run: brew install xcodegen
 
+      - name: Chuan hoa icon ung dung
+        shell: bash
+        run: |
+          set -e
+          ICON_DIR="TaiNguyen/Assets.xcassets/AppIcon.appiconset"
+          SOURCE_ICON="$ICON_DIR/icon.png"
+
+          if [ ! -f "$SOURCE_ICON" ]; then
+            echo "Khong tim thay $SOURCE_ICON"
+            exit 1
+          fi
+
+          WIDTH=$(sips -g pixelWidth "$SOURCE_ICON" | awk '/pixelWidth/ {print $2}')
+          HEIGHT=$(sips -g pixelHeight "$SOURCE_ICON" | awk '/pixelHeight/ {print $2}')
+
+          if [ "$WIDTH" != "$HEIGHT" ]; then
+            echo "icon.png phai la anh vuong. Hien tai: ${WIDTH}x${HEIGHT}"
+            exit 1
+          fi
+
+          cp "$SOURCE_ICON" "$ICON_DIR/icon-source.png"
+          sips -z 1024 1024 "$ICON_DIR/icon-source.png" --out "$ICON_DIR/AppIcon-1024.png" >/dev/null
+
+          python3 - <<'PYICON'
+          import json
+          from pathlib import Path
+
+          icon_dir = Path("TaiNguyen/Assets.xcassets/AppIcon.appiconset")
+          contents = {
+              "images": [
+                  {
+                      "filename": "AppIcon-1024.png",
+                      "idiom": "universal",
+                      "platform": "ios",
+                      "size": "1024x1024"
+                  }
+              ],
+              "info": {
+                  "author": "xcode",
+                  "version": 1
+              }
+          }
+          (icon_dir / "Contents.json").write_text(
+              json.dumps(contents, ensure_ascii=False, indent=2),
+              encoding="utf-8"
+          )
+          PYICON
+
+          sips -g pixelWidth -g pixelHeight "$ICON_DIR/AppIcon-1024.png"
+
       - name: Tao Xcode project
         run: xcodegen generate
 
