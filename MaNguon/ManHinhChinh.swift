@@ -123,7 +123,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         tieuDeThang.text = dinhDang.string(from: thang).capitalized
         let soO = TienIchNgay.soNgay(thang) + TienIchNgay.lich.component(.weekday, from: thang) - 1
         let soHang = Int(ceil(Double(soO) / 7.0))
-        rangBuocChieuCaoLich.constant = CGFloat(soHang * 60 + max(0, soHang - 1) * 5)
+        rangBuocChieuCaoLich.constant = CGFloat(soHang * 55 + max(0, soHang - 1) * 5)
         luoi.collectionViewLayout.invalidateLayout()
         luoi.reloadData()
         capNhatTab()
@@ -179,7 +179,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         let conThieu = max(0, mucTieu - hienTai)
         let canMoiNgay = ngayCongConLai > 0 ? max(0, mucTieu * Double(ngayCongThang) - tongPhanTram) / Double(ngayCongConLai) : 0
 
-        return String(format: "  Định mức công: %.0f giờ\n  Hiện tại: %.2f/%.0f giờ, thiếu %.2f giờ\n\n  Sản lượng tháng: %.2f%%\n  Hiện tại: %.2f%%\n  Còn thiếu: %.2f%%, cần %.2f%%/ngày", gioThang, gioThucTe, gioDenHienTai, gioThieu, mucTieu, hienTai, conThieu, canMoiNgay)
+        return String(format: "  Định mức công: %.0f giờ\n  Hiện tại: %.2f/%.0f giờ, thiếu %.2f giờ\n  Công đoạn định mức: %.2f%%\n  Hiện tại: %.2f%%\n  Còn thiếu: %.2f%%, cần %.2f%%/ngày", gioThang, gioThucTe, gioDenHienTai, gioThieu, mucTieu, hienTai, conThieu, canMoiNgay)
     }
 
 
@@ -207,6 +207,6 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let rong = floor((collectionView.bounds.width - 42) / 7)
-        return CGSize(width: rong, height: 60)
+        return CGSize(width: rong, height: 55)
     }
 }
