@@ -18,6 +18,10 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         luoi.delegate = self
         luoi.register(ONgay.self, forCellWithReuseIdentifier: ONgay.ma)
         luoi.backgroundColor = .systemGroupedBackground
+        luoi.isScrollEnabled = false
+        luoi.alwaysBounceVertical = false
+        luoi.showsVerticalScrollIndicator = false
+        luoi.showsHorizontalScrollIndicator = false
         return luoi
     }()
 
@@ -99,7 +103,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             luoi.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             luoi.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             rangBuocChieuCaoLich,
-            tieuDeThongKe.topAnchor.constraint(greaterThanOrEqualTo: luoi.bottomAnchor,constant: 2),
+            tieuDeThongKe.topAnchor.constraint(equalTo: luoi.bottomAnchor, constant: 2),
             tieuDeThongKe.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             tieuDeThongKe.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
             chonTab.topAnchor.constraint(equalTo: tieuDeThongKe.bottomAnchor, constant: 2),
@@ -108,13 +112,13 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
             noiDungTongHop.topAnchor.constraint(equalTo: chonTab.bottomAnchor, constant: 3),
             noiDungTongHop.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             noiDungTongHop.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            noiDungTongHop.heightAnchor.constraint(equalToConstant: 130),
-            bangCongDoanDu.heightAnchor.constraint(equalToConstant: 130),
+            noiDungTongHop.heightAnchor.constraint(equalToConstant: 150),
+            noiDungTongHop.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4),
             bangCongDoanDu.topAnchor.constraint(equalTo: chonTab.bottomAnchor, constant: 3),
             bangCongDoanDu.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             bangCongDoanDu.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            noiDungTongHop.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -4),
-            bangCongDoanDu.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -4)
+            bangCongDoanDu.heightAnchor.constraint(equalToConstant: 150),
+            bangCongDoanDu.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4)
         ])
     }
 
@@ -125,7 +129,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         tieuDeThang.text = dinhDang.string(from: thang).capitalized
         let soO = TienIchNgay.soNgay(thang) + TienIchNgay.lich.component(.weekday, from: thang) - 1
         let soHang = Int(ceil(Double(soO) / 7.0))
-        rangBuocChieuCaoLich.constant = CGFloat(soHang * 55 + max(0, soHang - 1) * 5)
+        rangBuocChieuCaoLich.constant = CGFloat(soHang * 55 + max(0, soHang - 1) * 5 + 2)
         luoi.collectionViewLayout.invalidateLayout()
         luoi.reloadData()
         capNhatTab()
@@ -181,7 +185,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         let conThieu = max(0, mucTieu - hienTai)
         let canMoiNgay = ngayCongConLai > 0 ? max(0, mucTieu * Double(ngayCongThang) - tongPhanTram) / Double(ngayCongConLai) : 0
 
-        return String(format: "  Định mức công: %.0f giờ\n  Hiện tại: %.2f/%.0f giờ, thiếu %.2f giờ\n  Công đoạn định mức: %.2f%%\n  Hiện tại: %.2f%%\n  Còn thiếu: %.2f%%, cần %.2f%%/ngày", gioThang, gioThucTe, gioDenHienTai, gioThieu, mucTieu, hienTai, conThieu, canMoiNgay)
+        return String(format: "  Định mức công: %.0f giờ\n  Hiện tại: %.2f/%.0f giờ, thiếu %.2f giờ\n\n  Sản lượng tháng: %.2f%%\n  Hiện tại: %.2f%%\n  Còn thiếu: %.2f%%, cần %.2f%%/ngày", gioThang, gioThucTe, gioDenHienTai, gioThieu, mucTieu, hienTai, conThieu, canMoiNgay)
     }
 
 
