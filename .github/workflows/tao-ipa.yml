@@ -74,7 +74,7 @@ jobs:
             Bản IPA chưa ký dành cho iPhone.
             Unsigned IPA for iPhone.
 
-            Bổ sung nút dấu trừ trên bàn phím và thu gọn khoảng cách giữa lịch với bảng thống kê.
+            Thu gọn chiều cao lịch; đưa thống kê sát lịch; Công đoạn dư hiển thị hai cột và cuộn đầy đủ.
             Updated hour statistics, average productivity, current-day highlight, and lunar calendar.
 
             Tải IPA trong Assets rồi ký bằng ESign.

@@ -5,7 +5,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
     private let tieuDeThang = UILabel()
     private let tieuDeThongKe = UILabel()
     private let chonTab = UISegmentedControl(items: ["Thống kê", "Công đoạn dư"])
-    private let noiDungTongHop = UILabel()
+    private let noiDungTongHop = UITextView()
     private var rangBuocChieuCaoLich: NSLayoutConstraint!
 
     private lazy var luoi: UICollectionView = {
@@ -70,11 +70,15 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         chonTab.selectedSegmentIndex = 0
         chonTab.addTarget(self, action: #selector(doiTab), for: .valueChanged)
 
-        noiDungTongHop.numberOfLines = 0
         noiDungTongHop.font = .monospacedDigitSystemFont(ofSize: 13, weight: .semibold)
         noiDungTongHop.backgroundColor = .secondarySystemGroupedBackground
         noiDungTongHop.layer.cornerRadius = 14
         noiDungTongHop.clipsToBounds = true
+        noiDungTongHop.isEditable = false
+        noiDungTongHop.isSelectable = false
+        noiDungTongHop.isScrollEnabled = true
+        noiDungTongHop.alwaysBounceVertical = true
+        noiDungTongHop.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
 
         [hangThang, hangThu, luoi, tieuDeThongKe, chonTab, noiDungTongHop].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +118,7 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
         tieuDeThang.text = dinhDang.string(from: thang).capitalized
         let soO = TienIchNgay.soNgay(thang) + TienIchNgay.lich.component(.weekday, from: thang) - 1
         let soHang = Int(ceil(Double(soO) / 7.0))
-        rangBuocChieuCaoLich.constant = CGFloat(soHang * 72 + max(0, soHang - 1) * 7)
+        rangBuocChieuCaoLich.constant = CGFloat(soHang * 58 + max(0, soHang - 1) * 5)
         luoi.collectionViewLayout.invalidateLayout()
         luoi.reloadData()
         capNhatTab()
@@ -168,9 +172,23 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
 
     private func noiDungCongDoanDu() -> String {
         let danhSach = KhoCongDoanDu.dungChung.danhSach
-        guard !danhSach.isEmpty else { return "  Chưa có công đoạn dư." }
-        let cacDong = danhSach.map { "  \($0.heSo.chuoiGon)%  |  \($0.soLuong.chuoiGon) tờ" }
-        return (["  PHẦN TRĂM  |  SỐ TỜ", ""] + cacDong).joined(separator: "\n")
+        guard !danhSach.isEmpty else { return "Chưa có công đoạn dư." }
+
+        let nua = Int(ceil(Double(danhSach.count) / 2.0))
+        let cotTrai = Array(danhSach.prefix(nua))
+        let cotPhai = Array(danhSach.dropFirst(nua))
+        var cacDong = ["% / SỐ TỜ            % / SỐ TỜ", ""]
+
+        for viTri in 0..<nua {
+            let trai = dinhDangCongDoanDu(cotTrai[viTri])
+            let phai = viTri < cotPhai.count ? dinhDangCongDoanDu(cotPhai[viTri]) : ""
+            cacDong.append(trai.padding(toLength: 20, withPad: " ", startingAt: 0) + phai)
+        }
+        return cacDong.joined(separator: "\n")
+    }
+
+    private func dinhDangCongDoanDu(_ dong: CongDoanDu) -> String {
+        "\(dong.heSo.chuoiGon)% / \(dong.soLuong.chuoiGon) tờ"
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -197,6 +215,6 @@ final class ManHinhChinh: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let rong = floor((collectionView.bounds.width - 42) / 7)
-        return CGSize(width: rong, height: 72)
+        return CGSize(width: rong, height: 58)
     }
 }
