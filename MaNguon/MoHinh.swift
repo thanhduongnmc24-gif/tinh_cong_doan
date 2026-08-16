@@ -40,7 +40,7 @@ struct CongDoanDu: Codable, Hashable {
 
 final class KhoCongDoanDu {
     static let dungChung = KhoCongDoanDu()
-    private let khoa = "cong-doan-du-v2"
+    private let khoa = "cong-doan-du-v3-doc-lap"
     private(set) var danhSach: [CongDoanDu] = []
 
     private init() { doc() }
@@ -54,17 +54,6 @@ final class KhoCongDoanDu {
     func congDon(_ cacDong: [CongDoan]) {
         var bang = Dictionary(uniqueKeysWithValues: danhSach.map { ($0.heSo, $0.soLuong) })
         for dong in cacDong where dong.heSo > 0 && dong.soLuong != 0 {
-            bang[dong.heSo, default: 0] += dong.soLuong
-        }
-        ganBang(bang)
-    }
-
-    func capNhat(duLieuCu: [CongDoan], duLieuMoi: [CongDoan]) {
-        var bang = Dictionary(uniqueKeysWithValues: danhSach.map { ($0.heSo, $0.soLuong) })
-        for dong in duLieuCu where dong.heSo > 0 && dong.soLuong != 0 {
-            bang[dong.heSo, default: 0] -= dong.soLuong
-        }
-        for dong in duLieuMoi where dong.heSo > 0 && dong.soLuong != 0 {
             bang[dong.heSo, default: 0] += dong.soLuong
         }
         ganBang(bang)

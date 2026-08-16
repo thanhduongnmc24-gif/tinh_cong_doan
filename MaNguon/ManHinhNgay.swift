@@ -311,12 +311,10 @@ final class ManHinhNgay: UIViewController, UITextFieldDelegate {
         duLieu.gioKetThuc = ketThuc.date
         duLieu.nghiLam = nghi.isOn
         duLieu.phutChuan = max(0, docSo(phutChuan.text))
-        let congDoanCu = duLieu.congDoan
         let congDoanMoi = docCongDoan()
         duLieu.congDoan = congDoanMoi
         duLieu.phanTram = tinhPhanTram()
         duLieu.daTinh = congDoanMoi.contains { $0.soLuong != 0 || $0.heSo != 0 }
-        KhoCongDoanDu.dungChung.capNhat(duLieuCu: congDoanCu, duLieuMoi: congDoanMoi)
         KhoDuLieu.dungChung.luu(duLieu)
         dismiss(animated: true, completion: khiDong)
     }
