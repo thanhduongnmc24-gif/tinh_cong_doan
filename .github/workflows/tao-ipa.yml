@@ -124,7 +124,7 @@ jobs:
             Bản IPA chưa ký dành cho iPhone.
             Unsigned IPA for iPhone.
 
-            Sửa chiều cao lịch theo đúng khoảng cách hàng; bảng tổng hợp kéo sát đáy màn hình; Công đoạn dư dạng bảng Excel.
+            Lưu toàn bộ dữ liệu vào Documents/DuLieuTinhCong dưới dạng JSON để sao chép sang thiết bị khác.
             Updated hour statistics, average productivity, current-day highlight, and lunar calendar.
 
             Tải IPA trong Assets rồi ký bằng ESign.
